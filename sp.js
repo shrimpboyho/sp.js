@@ -13,6 +13,10 @@
     /* entity object */
     
     window.spEntity = function(x, y){
+        this.topLeft = 0;
+        this.topRight = 0;
+        this.bottomLeft = 0;
+        this.bottomRight = 0;
         this.posX = 0;
         this.posY = 0;
         this.forces = [];
@@ -48,7 +52,7 @@
     
     //math shit here
     spCore.prototype.calc = function(cb){
-            // have the forces act upon the objects
+            // have the natural forces act upon the objects
             var i, j, k;
             for(i = 0; i < this.naturalForces.length; i++){
                 var currentForce = this.naturalForces[i];
@@ -67,8 +71,10 @@
                     console.log(ycomp);
                     
                     // Move the object dependinding on the force vector
-                    currentEntity.posX = currentEntity.posX + xcomp;
-                    currentEntity.posY = currentEntity.posY + ycomp;
+                    if(currentEntity.posX > 0)
+                        currentEntity.posX = currentEntity.posX + xcomp;
+                    if(currentEntity.posY > 0)
+                        currentEntity.posY = currentEntity.posY + ycomp;
                     
                     // Apply the internal forces
                     for(k = 0; k < currentEntity.forces.length; k++){
@@ -83,7 +89,8 @@
                         // Move the object dependinding on the force vector
                         currentEntity.posX = currentEntity.posX + xcomp;
                         currentEntity.posY = currentEntity.posY + ycomp;
-                    };
+                            
+                    };                    
                 }
             }
             console.log("calc cycle");
@@ -141,7 +148,9 @@ engine.setDrawFunction(function(){
     for(i = 0; i < engine.entities.length; i++){
         var junk = engine.entities[i];  
         ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect (junk.posX, junk.posY, 55, 50);
+        ctx.fillRect (junk.posX, junk.posY + 10, 50, 50);
+        //ctx.fillStyle = "rgb(0,200,0)";
+        //ctx.fillRect (junk.posX + 10, junk.posY + 10, 20, 20);
     }
 });
 
