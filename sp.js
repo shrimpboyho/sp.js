@@ -3,6 +3,7 @@
     window.spVector = function(mag, angle){
         this.magnitude = 0;
         this.angle = 0;
+        this.acceleration = 0;
         if(mag)
             this.magnitude = mag;
         if(angle)
@@ -14,6 +15,7 @@
     window.spEntity = function(x, y){
         this.posX = 0;
         this.posY = 0;
+        this.forces = [];
         if(x)
             this.posX = x;
         if(y)
@@ -21,7 +23,6 @@
     };
     
     /* engine object */
-    
     // constructor
     window.spCore = function(){
         // important data variables
@@ -48,16 +49,41 @@
     //math shit here
     spCore.prototype.calc = function(cb){
             // have the forces act upon the objects
-            var i, j;
+            var i, j, k;
             for(i = 0; i < this.naturalForces.length; i++){
                 var currentForce = this.naturalForces[i];
                 for(j = 0; j < this.entities.length; j++){
                     var currentEntity = this.entities[j];
-                    // Move the object dependinding on the force vector
+                    
+                    // Determine the x and y components of the vector
+                    if(currentForce.acceleration)
+                        currentForce.magnitude += currentForce.acceleration;
                     var mag = currentForce.magnitude;
-                    // Convert the angle   
                     var angle = currentForce.angle;
-                    currentEntity.posY = currentEntity.posY - mag;
+                    var xcomp = Math.cos(angle) * mag;
+                    var ycomp = Math.sin(angle) * mag;
+                    
+                    console.log("Y COMP OF GRAVITY");
+                    console.log(ycomp);
+                    
+                    // Move the object dependinding on the force vector
+                    currentEntity.posX = currentEntity.posX + xcomp;
+                    currentEntity.posY = currentEntity.posY + ycomp;
+                    
+                    // Apply the internal forces
+                    for(k = 0; k < currentEntity.forces.length; k++){
+                        var currentForceInner = currentEntity.forces[k]; 
+                        
+                        // Determine the x and y components of the vector
+                        var mag = currentForceInner.magnitude;
+                        var angle = currentForceInner.angle;
+                        var xcomp = Math.cos(angle) * mag;
+                        var ycomp = Math.sin(angle) * mag;
+                    
+                        // Move the object dependinding on the force vector
+                        currentEntity.posX = currentEntity.posX + xcomp;
+                        currentEntity.posY = currentEntity.posY + ycomp;
+                    };
                 }
             }
             console.log("calc cycle");
@@ -90,13 +116,16 @@ var engine = new spCore();
 engine.setWorld(300,300);
 
 // create gravity force vector
-var gravity = new spVector(1,-90);
+var gravity = new spVector(2,3 * Math.PI / 2);
+gravity.acceleration = .30;
+var thrust = new spVector(5, Math.PI / 3);
 
-// load it into the engine
+// load the natural forces into the engine
 engine.naturalForces.push(gravity);
 
 // create some entities and put them in the engine
 var junk = new spEntity(40,200);
+junk.forces.push(thrust);
 engine.entities.push(junk);
 var junk2 = new spEntity(150,200);
 engine.entities.push(junk2);
