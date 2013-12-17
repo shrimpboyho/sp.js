@@ -13,10 +13,14 @@
     /* entity object */
     
     window.spEntity = function(x, y){
-        this.topLeft = 0;
-        this.topRight = 0;
-        this.bottomLeft = 0;
-        this.bottomRight = 0;
+        this.topLeftX = 0;
+        this.topLeftY = 0;
+        this.topRightX = 0;
+        this.topRightY = 0;
+        this.bottomLeftX = 0;
+        this.bottomLeftY = 0;
+        this.bottomRightX = 0;
+        this.bottomRightY = 0;
         this.posX = 0;
         this.posY = 0;
         this.forces = [];
@@ -24,6 +28,18 @@
             this.posX = x;
         if(y)
             this.posY = y;
+    };
+    spEntity.prototype.move = function(xoffset, yoffset){
+        this.topLeftX += xoffset;
+        this.topLeftY += yoffset;
+        this.topRightX += xoffset;
+        this.topRightY += yoffset;
+        this.bottomLeftX += xoffset;
+        this.bottomLeftY += yoffset;
+        this.bottomRightX += xoffset;
+        this.bottomRightY += yoffset;
+        this.posX += xoffset;
+        this.posY += yoffset;
     };
     
     /* engine object */
@@ -70,11 +86,9 @@
                     console.log("Y COMP OF GRAVITY");
                     console.log(ycomp);
                     
-                    // Move the object dependinding on the force vector
-                    if(currentEntity.posX > 0)
-                        currentEntity.posX = currentEntity.posX + xcomp;
-                    if(currentEntity.posY > 0)
-                        currentEntity.posY = currentEntity.posY + ycomp;
+                    // Move the object depending on the force vector
+                    currentEntity.move(xcomp, 0);
+                    currentEntity.move(0, ycomp);
                     
                     // Apply the internal forces
                     for(k = 0; k < currentEntity.forces.length; k++){
@@ -87,8 +101,7 @@
                         var ycomp = Math.sin(angle) * mag;
                     
                         // Move the object dependinding on the force vector
-                        currentEntity.posX = currentEntity.posX + xcomp;
-                        currentEntity.posY = currentEntity.posY + ycomp;
+                        currentEntity.move(xcomp, ycomp);
                             
                     };                    
                 }
@@ -132,11 +145,23 @@ engine.naturalForces.push(gravity);
 
 // create some entities and put them in the engine
 var junk = new spEntity(40,200);
+junk.bottomLeftX = 30;
+junk.bottomLeftY = 190;
 junk.forces.push(thrust);
 engine.entities.push(junk);
 var junk2 = new spEntity(150,200);
+junk2.bottomLeftX = 140;
+junk2.bottomLeftY = 190;
 engine.entities.push(junk2);
-
+var ground = new spEntity(150,10)
+ground.bottomLeftX = 0;
+ground.bottomLeftY = 0;
+ground.bottomRightX = 300;
+ground.bottomRightY = 0;
+ground.topLeftX = 0;
+ground.topLeftY = 20;
+ground.topLeftX = 300;
+ground.topLeftY = 20;
 // Create a draw function
 engine.setDrawFunction(function(){
     // Clear the canvas
@@ -148,9 +173,9 @@ engine.setDrawFunction(function(){
     for(i = 0; i < engine.entities.length; i++){
         var junk = engine.entities[i];  
         ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect (junk.posX, junk.posY + 10, 50, 50);
-        //ctx.fillStyle = "rgb(0,200,0)";
-        //ctx.fillRect (junk.posX + 10, junk.posY + 10, 20, 20);
+        ctx.fillRect (junk.posX, junk.posY, 50, 50);
+        ctx.fillStyle = "rgb(0,200,0)";
+        ctx.fillRect (ground.bottomLeftX, ground.bottomLeftY, 300, 20);
     }
 });
 
